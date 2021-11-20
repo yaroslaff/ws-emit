@@ -46,23 +46,6 @@ def list():
     print(f"list {args.path}")
     return json.dumps(os.listdir(args.path), indent=4)
 
-def get_redis():
-
-    if args.redis.startswith('/'):
-        path = args.redis
-        host = None
-        port = None
-    else:
-        host, port = args.redis.split(':')
-        path = None
-
-    print(f"connect to unix: {path} network: {host}:{port}")
-    return redis.Redis(
-        db=args.db,
-        unix_socket_path=path, 
-        host=host, port=port,
-        decode_responses=True)
-
 
 def watch():
 
@@ -70,7 +53,7 @@ def watch():
     i = inotify.adapters.Inotify()
 
     mask = inotify.constants.IN_CLOSE_WRITE
-    i.add_watch('/tmp', mask=mask)
+    i.add_watch(args.path, mask=mask)
 
     for event in i.event_gen(yield_nones=False):
         (_, type_names, path, filename) = event
@@ -80,7 +63,7 @@ def watch():
             'room': filename,
             'data': 'modified'
         }
-        print(f"emit update for {filename}")
+        print(f"emit update for file {filename}")
         socketio.emit('update', data, room=filename)
         
 
