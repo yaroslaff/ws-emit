@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 
 import redis
+import sys
+import signal
 import json
 import os
 import argparse
 import inotify.adapters, inotify.constants
+import signal
 import threading
 from flask_socketio import SocketIO
 
@@ -13,6 +16,7 @@ from flask import Flask, render_template, session, request, \
 
 args = None
 r = None
+th = None
 
 app = Flask(__name__)
 
@@ -46,29 +50,42 @@ def list():
     print(f"list {args.path}")
     return json.dumps(os.listdir(args.path), indent=4)
 
+#def signal_handler(sig, frame):
+#    print(f"stop ({signal.Signals(sig).name})")
+#    sys.exit(0)
 
 def watch():
 
     socketio = SocketIO(message_queue=args.redis)
     i = inotify.adapters.Inotify()
 
-    mask = inotify.constants.IN_CLOSE_WRITE
+    mask = inotify.constants.IN_CLOSE_WRITE | inotify.constants.IN_CREATE | inotify.constants.IN_DELETE
     i.add_watch(args.path, mask=mask)
 
     for event in i.event_gen(yield_nones=False):
         (_, type_names, path, filename) = event
         #print("PATH=[{}] FILENAME=[{}] EVENT_TYPES={}".format(
-        #      path, filename, type_names))
-        data = {
-            'room': filename,
-            'data': 'modified'
-        }
-        print(f"emit update for file {filename}")
-        socketio.emit('update', data, room=filename)
-        
+        #        path, filename, type_names))
+
+
+        if 'IN_DELETE' in type_names or 'IN_CREATE' in type_names:
+            print("rescan!")
+            data = {
+                'room': '#rescan',
+                'data': 'modified'
+            }
+            print(f"emit update for #rescan")
+            socketio.emit('rescan', data, room='#rescan')
+        else:                    
+            data = {
+                'room': filename,
+                'data': 'modified'
+            }
+            print(f"Emit update for file {filename}")
+            socketio.emit('update', data, room=filename)
 
 def main():
-    global args, r
+    global args, r, th
 
     def_redis = 'redis://'
     def_path = '/tmp'
@@ -89,12 +106,13 @@ def main():
     args = parser.parse_args()
 
     r = redis.Redis.from_url(args.redis)
-    # watch()
 
     th = threading.Thread(target=watch, args=())
+    th.daemon = True 
     th.start()
 
     addr = args.address.split(':')
     app.run(host=addr[0], port=int(addr[1]))
+
 
 main()

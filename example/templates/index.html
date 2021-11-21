@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>File watch (based on Flask-SocketIO)</title>
+    <title>Redis2Websocket instant webserver (based on Flask-SocketIO)</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
@@ -15,6 +15,7 @@
             // The callback function is invoked when a connection with the
             // server is established.
             socket.on('connect', function() {
+                socket.emit('watch', {room: '#rescan'});
             });
 
             // Event handler for server sent data.
@@ -22,12 +23,11 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('update', function(msg, cb) {
-                console.log("GOT UPDATE", msg)
-                console.log("DATA:", msg.data)
-                $('#log').append('<br>' + $('<div/>').text('Received #' + msg).html());
-                if (cb)
-                    cb();
                 load(msg.room)
+            });
+
+            socket.on('rescan', function(msg, cb){
+                scan()
             });
 
             // Interval function that tests message latency by sending a "ping"
@@ -42,26 +42,72 @@
 
             var current_room = null;
 
+            function nochild(e){
+                while (e.firstChild) {
+                            e.removeChild(e.firstChild);
+                        }
+            }
+
+            function scan(){
+
+                fetch('/_list')
+                .then( r => {
+                    return r.json()
+                })
+                .then(data => {
+                    let file
+                    let ul = document.getElementById('filelist')
+
+                    nochild(ul);
+
+                    data.forEach( file => {
+
+                        let li = document.createElement("li")
+                        let a = document.createElement("a");
+                        // a.href = "#"+file;
+                        a.onclick = function() {
+                            load(file);
+                        }
+                        a.href="#";
+                        a.textContent = file;
+
+                        li.appendChild(a)
+                        ul.appendChild(li)
+
+                    })
+                })
+            }
+
+
             function load(fn){
-                console.log(`LOAD ${fn}`)
                 if(current_room != fn){
                     socket.emit('stopwatch', {room: fn});
                 }
                 fetch(fn)
                     .then( r => r.text())
                     .then( txt => {
-                        console.log("update.....")
+
+                        let e;
+                        let content;
+
+                        /* draw filename */
+                        e = document.getElementById('filename')
+                        nochild(e)
+                        content = document.createTextNode(`Content of ${fn}`)
+                        e.appendChild(content)
+
+
                         /* update file content*/
-                        e = document.getElementById('file')
+                        e = document.getElementById('content')
                         content = document.createTextNode(txt)
 
                         while (e.firstChild) {
                             e.removeChild(e.firstChild);
                         }
+
                         e.appendChild(content)
 
                         if(current_room != fn){
-                            console.log(`watch ${fn}`)
                             socket.emit('watch', {room: fn});
                             current_room = fn
                         }
@@ -69,39 +115,13 @@
                     .catch( e=> {
                         console.log("error:", e)
                     })
-            }
-
-            fetch('/_list')
-            .then( r => {
-                return r.json()
-            })
-            .then(data => {
-                let file
-                let ul = document.getElementById('filelist')
-                data.forEach( file => {
-
-                    let li = document.createElement("li")
-                    let a = document.createElement("a");
-                    // a.href = "#"+file;
-                    a.onclick = function() {
-                        load(file);
-                    }
-                    a.href="#";
-                    a.textContent = file;
-
-                    li.appendChild(a)
-                    ul.appendChild(li)
-
-                    //console.log(file)
-                    //e.innerHTML += `<li>${file}\n`
-                })
-            })
-
+            }            
+            scan()
         });
     </script>
 </head>
 <body>
-    <h1>Websocket instant webserver (based on Flask-SocketIO Test)</h1>
+    <h1>Redis2Websocket instant webserver (based on Flask-SocketIO)</h1>
     
     <h2>Load file:</h2>
     <div>
@@ -109,10 +129,7 @@
         </ul>
     </div>
 
-    <h2>File:</h2>
-    <div id="file"></div>
-    
-    <h2>Receive:</h2>
-    <div id="log"></div>
+    <h2 id="filename"></h2>
+    <div id="content"></div>
 </body>
 </html>

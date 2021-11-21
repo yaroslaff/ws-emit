@@ -191,9 +191,7 @@ def main():
     if '*' in args.cors:
         args.cors = '*'
     
-    print("use secret:", args.secret)
     app.config['SECRET_KEY'] = args.secret
-
 
     socketio.init_app(app, async_mode=async_mode, cors_allowed_origins=args.cors, message_queue='redis://', 
         namespace='/test', logger=True, engineio_logger=True)

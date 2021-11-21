@@ -2,3 +2,5 @@ flask
 eventlet
 Flask_SocketIO
 redis
+hiredis
+
