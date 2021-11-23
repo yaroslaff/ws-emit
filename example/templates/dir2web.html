@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Redis2Websocket/Flask-SocketIO demo</title>
+    <title>dir2web Redis2Websocket/Flask-SocketIO demo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js" integrity="sha512-aMGMvNYu8Ue4G+fHa359jcPb1u+ytAF+P2SCb+PxrjCdO3n3ZTxJ30zuH39rimUggmTwmh2u7wvQsDTHESnmfQ==" crossorigin="anonymous"></script>
     <script type="text/javascript" charset="utf-8">
@@ -9,13 +9,22 @@
             // Connect to the Socket.IO server.
             // The connection URL has the following format, relative to the current page:
             //     http[s]://<domain>:<port>[/<namespace>]
-            var socket = io('http://localhost:8899/');
+            var socket = io('http://localhost:8899');
+            var room_secret = null;
+
 
             // Event handler for new connections.
             // The callback function is invoked when a connection with the
             // server is established.
             socket.on('connect', function() {
-                socket.emit('watch', {room: '#rescan'});
+                // get room secret
+                fetch('_secret')
+                    .then( r => r.text() )
+                    .then(r => {
+                        room_secret = r
+                        console.log(`join rescan room with ${room_secret}`)
+                        socket.emit('join', {room: 'dir::_rescan', secret: room_secret});
+                    })
             });
 
             // Event handler for server sent data.
@@ -23,10 +32,12 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('update', function(msg, cb) {
-                load(msg.room)
+                console.log('update')
+                load(msg.file)
             });
 
             socket.on('rescan', function(msg, cb){
+                console.log('rescan')
                 scan()
             });
 
@@ -81,7 +92,7 @@
 
             function load(fn){
                 if(current_room != fn){
-                    socket.emit('stopwatch', {room: fn});
+                    socket.emit('leave', {room: fn});
                 }
                 fetch(fn)
                     .then( r => r.text())
@@ -108,7 +119,7 @@
                         e.appendChild(content)
 
                         if(current_room != fn){
-                            socket.emit('watch', {room: fn});
+                            socket.emit('join', {room: 'dir::'+fn, secret: room_secret});
                             current_room = fn
                         }
                     })

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import redis
-import sys
-import signal
 import json
 import os
 import argparse
 import inotify.adapters, inotify.constants
+import secrets
 import signal
 import threading
 from flask_socketio import SocketIO
@@ -17,13 +16,15 @@ from flask import Flask, render_template, session, request, \
 args = None
 r = None
 th = None
-
+room_secret = None
 app = Flask(__name__)
+
+
 
 @app.route('/')
 def index():
     print(f"<{os.getpid()}> index")
-    return render_template('index.html')
+    return render_template('dir2web.html')
 
 @app.route('/<path:path>')
 def catch_all(path):
@@ -50,9 +51,10 @@ def list():
     print(f"list {args.path}")
     return json.dumps(os.listdir(args.path), indent=4)
 
-#def signal_handler(sig, frame):
-#    print(f"stop ({signal.Signals(sig).name})")
-#    sys.exit(0)
+@app.route('/_secret')
+def secret():
+    return room_secret
+
 
 def watch():
 
@@ -69,28 +71,27 @@ def watch():
 
 
         if 'IN_DELETE' in type_names or 'IN_CREATE' in type_names:
-            print("rescan!")
             data = {
-                'room': '#rescan',
                 'data': 'modified'
             }
-            print(f"emit update for #rescan")
-            socketio.emit('rescan', data, room='#rescan')
+            print("Emit rescan")
+            socketio.emit('rescan', data, room='dir::_rescan')
         else:                    
             data = {
-                'room': filename,
+                'file': filename,
                 'data': 'modified'
             }
             print(f"Emit update for file {filename}")
-            socketio.emit('update', data, room=filename)
+            socketio.emit('update', data, room='dir::'+filename)
 
 def main():
-    global args, r, th
+    global args, r, th, room_secret
 
     def_redis = 'redis://'
     def_path = '/tmp'
     def_address = '0.0.0.0:7788'
     def_redis = os.getenv('REDIS') or 'redis://localhost:6379/0'
+    def_secret = secrets.token_urlsafe(32)
 
 
     parser = argparse.ArgumentParser(description='redis2websocket demo')
@@ -100,12 +101,16 @@ def main():
         help=f'redis URL. Def: {def_redis}')
     parser.add_argument('-a', '--address', default=def_address,
         help=f'bind to this Address. Def: {def_address}')
+    parser.add_argument('--secret', default=def_secret, 
+        help=f'room secret (def: random)')
     parser.add_argument('path', default=def_path, nargs='?',
         help=f'directory path. Def: {def_path}')
 
     args = parser.parse_args()
 
     r = redis.Redis.from_url(args.redis)
+    room_secret = args.secret
+    r.set('r2ws::room_secret::dir', room_secret)
 
     th = threading.Thread(target=watch, args=())
     th.daemon = True 
