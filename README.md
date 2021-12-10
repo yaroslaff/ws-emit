@@ -26,6 +26,10 @@ redis2websocket is based on [Flask-SocketIO](https://github.com/miguelgrinberg/F
 ~~~
 pip3 install redis2websocket
 ~~~
+or, install right from github repo:
+~~~
+pip3 install git+https://github.com/yaroslaff/redis2websocket
+~~~
 
 If you want to install as systemd service:
 ~~~
