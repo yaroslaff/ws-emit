@@ -37,7 +37,7 @@ def main():
 
     def_redis = 'redis://'
     def_path = '/tmp'
-    def_address = '0.0.0.0:7788'
+    def_address = 'localhost:7788'
     def_redis = os.getenv('REDIS') or 'redis://localhost:6379/0'
 
 

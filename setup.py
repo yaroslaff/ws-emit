@@ -3,7 +3,6 @@
 import os
 from setuptools import setup
 
-
 def read(filename):
     return open(os.path.join(os.path.dirname(__file__), filename)).read()
 
@@ -25,9 +24,25 @@ setup(
     install_requires=[
         'redis',
         'requests',
+        'inotify',
+        'flask-socketio',
+        'eventlet'
     ],
     data_files=[
-        ('redis2websocket', ['contrib/redis2websocket.service']),
+        ('redis2websocket/contrib', [
+            'contrib/redis2websocket.service',
+            'contrib/redis2websocket'
+            ]),
+        ('redis2websocket/example', [
+            'example/requirements.txt',
+            'example/time.py',
+            'example/dir2web.py',
+            'example/subspy.py'
+        ]),
+        ('redis2websocket/example/templates', [
+            'example/templates/time.html',
+            'example/templates/dir2web.html'
+        ])
     ],
 
     python_requires='>=3',
