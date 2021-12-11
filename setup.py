@@ -9,7 +9,7 @@ def read(filename):
 
 setup(
     name='redis2websocket',
-    version='0.0.1',
+    version='0.0.1post1',
     scripts=['redis2websocket.py'],
 
     # install_requires=[],
@@ -20,7 +20,7 @@ setup(
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     author_email='yaroslaff@gmail.com',
-    description='Simple HTTP client which takes request data from redis',
+    description='websocket microservice, easy to integrate with any python application',
     install_requires=[
         'redis',
         'requests',
@@ -52,7 +52,7 @@ setup(
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
-        'Programming Language :: Python',        
+        'Programming Language :: Python :: 3.6',        
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
         # Specify the Python versions you support here. In particular, ensure

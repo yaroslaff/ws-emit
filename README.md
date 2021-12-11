@@ -22,6 +22,13 @@ redis2websocket is based on [Flask-SocketIO](https://github.com/miguelgrinberg/F
         time.sleep(1)
 ~~~
 
+## redis2websocket vs Flask-SocketIO
+redis2websocket is based on [Flask](flask.palletsprojects.com/), [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-SocketIO) and [eventlet](https://eventlet.net/). 
+
+Using Flask-SocketIO as server requires to integrate application with Flask and with async webserver with websocket feature such as eventlet. This maybe not very good and not very simple if you use other framework and webserver. Witch redis2websocket, application use Flask-SocketIO in much more simple way.
+
+Also, redis2websocket provides easy authentication mechanism, and you can use one redis2websocket service for many applications.
+
 ## Installation
 ~~~
 pip3 install redis2websocket
@@ -39,11 +46,13 @@ systemctl daemon-reload
 systemctl enable redis2websocket
 systemctl start redis2websocket
 ~~~
+If you want to adjust CORS or ADDRESS settings, edit /etc/default/redis2websocket and restart service.
 
 If you want to run manually from shell:
 ~~~
+# specify default parameters
+redis2websocket.py -a 0.0.0.0:8899 --cors http://localhost:7788
 ~~~
-
 
 ## Authentication and room-spaces
 Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key r2ws::room_secret::*roomspace*. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key and pass secret to frontend.
