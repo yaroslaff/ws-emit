@@ -58,7 +58,7 @@ ws-emit.py -a 0.0.0.0:8899 --cors http://localhost:7788 --secret 123
 ~~~
 
 ## Authentication and room-spaces
-Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key ws-emit::room_secret::*roomspace*. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key and pass secret to frontend.
+Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key ws-emit::room_secret::*roomspace*. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key in redis (e.g. `SET ws-emit::room_secret::myroom MySecret_123`) and pass secret to frontend.
 
 Rooms without '::' in name, are public, anyone can join it. They are not suited to send any sensitive info.
 
@@ -102,7 +102,7 @@ Start `/usr/local/ws-emit/example/time.py` in console. Navigate browser to http:
 
 Caveats:
 - Make sure addresses are exactly matching to CORS value in ws-emit, http://localhost:7788 (default) and http://127.0.0.1:7788 are different
-- socketio server address (http://localhost:8899) is hardcoded into HTML file (/usr/local/ws-emit/example/templates/dir2web.html). If you start it not on localhost (e.g. in LXC container), you need to set correct address.
+- websocket server address (http://localhost:8899) is hardcoded into HTML file (/usr/local/ws-emit/example/templates/dir2web.html). If you start it not on localhost (e.g. in LXC container), you need to set correct address in HTML template.
 
 ### dir2web
 Dir2web is more complex example with authentication and room-spaces.
