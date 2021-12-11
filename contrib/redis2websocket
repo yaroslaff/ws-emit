@@ -10,3 +10,5 @@ ADDRESS="0.0.0.0:8899"
 # space-separated list of cross-origin sources (without trailing slash!)
 CORS="http://localhost:7788"
 
+# Fill any non-empty value to enable HTTP interface
+SECRET=""

@@ -23,6 +23,19 @@ socketio = SocketIO()
 # redis
 r = None
 
+
+#
+# flask submit
+#
+def emit():
+    event = request.json.get('event')
+    room = request.json.get('room')
+    data = request.json.get('data')
+    namespace = request.json.get('namespace')
+    socketio.emit(event, data, room=room, namespace=namespace)
+
+    return 'OK\n'
+
 #
 # Websocket methods
 #
@@ -70,7 +83,8 @@ def main():
     def_redis = os.getenv('REDIS') or 'redis://localhost:6379/0'
     def_address = os.getenv('ADDRESS') or '0.0.0.0:8899'
     def_cors = [os.getenv('CORS', 'http://localhost:7788')]
-    def_flask_secret = os.getenv('SECRET') or secrets.token_urlsafe(32)
+    def_secret = os.getenv('SECRET')
+    def_flask_secret = os.getenv('FLASK_SECRET') or secrets.token_urlsafe(32)
 
     parser = argparse.ArgumentParser(description='Redis-to-websocket interface')
     parser.add_argument('-v', dest='verbose', action='store_true',
@@ -81,7 +95,9 @@ def main():
         help=f'bind to this Address def: {def_address}')
     parser.add_argument('--cors', default=def_cors, nargs='+',
         help=f'CORS url (without training slash), can repeat or "*". def: {def_cors}')
-    parser.add_argument('--secret', default=def_flask_secret, 
+    parser.add_argument('--secret', default=def_secret, 
+        help=f'Secret to submit messages over HTTP')
+    parser.add_argument('--flask-secret', default=def_flask_secret, 
         help=f'Flask app secret (any string). Omit to use auto-generated random string')
 
     args = parser.parse_args()
@@ -119,6 +135,9 @@ def main():
     socketio.init_app(app, async_mode=async_mode, cors_allowed_origins=cors, 
         message_queue=args.redis, logger=False, engineio_logger=False)
 
+    if args.secret:
+        print("Enable HTTP emitting with secret")
+        app.add_url_rule('/emit', methods=['POST'], view_func=emit)
     
     addr = args.address.split(':')
 

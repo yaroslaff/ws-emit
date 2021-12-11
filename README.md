@@ -2,7 +2,10 @@
 
 redis2websocket is simple microservice app to send (backend-to-frontend, one way) instant signals from backend to frontend web applications running in browser. redis2websocket handles CORS configuration and authentication mechanism for different *room-spaces*.
 
-For example: online shop may update prices and stock information for all visitors in realtime, without need to refresh. And logged-in customers can see realtime status of their orders. 
+Example usages:
+- ecommerce website may update prices and stock information for all visitors in realtime, without need to refresh. And logged-in customers can see realtime status of their orders. 
+- social network may show user if someone is writing new comment right now and display comment when it will be sent
+- backend may update frontend about status of long-running requests, such as 'build is N% ready', 'deploying'
 
 redis2websocket is isolated microservice, running as separate process, so it does not require any integration and compatibility with your application.
 
@@ -58,6 +61,37 @@ redis2websocket.py -a 0.0.0.0:8899 --cors http://localhost:7788
 Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key r2ws::room_secret::*roomspace*. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key and pass secret to frontend.
 
 Rooms without '::' in name, are public, anyone can join it. They are not suited to send any sensitive info.
+
+## Emitting messages over HTTP(s)
+It's possible to emit messages from any sources (any programming languages, even from PHP. really.) using HTTP interface. Here is simple example how to emit websocket events right from shell using curl.
+
+HTTP emitting requres secret, like:
+~~~
+./redis2websocket.py --secret 123
+~~~
+
+or set `SECRET=123` in /etc/default/redis2websocket
+
+JSON file `x.json`:
+~~~
+{
+	"event": "update",
+	"room": "time",
+	"data": {
+		"time": 111111
+	},
+	"namespace": null,
+	"secret": "123"
+}
+~~~
+
+command:
+~~~
+curl -d @x.json -H "Content-Type: application/json" -X POST http://localhost:8899/emit
+~~~
+
+You may run `time.py` example (see below) and execute this curl statement, it will send time 111111 and it will be displayed in browser for short time (less then 1s) until overwritten by next update.
+
 
 ## Examples
 
