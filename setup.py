@@ -8,19 +8,19 @@ def read(filename):
 
 
 setup(
-    name='redis2websocket',
+    name='ws-emit',
     version='0.0.1post1',
-    scripts=['redis2websocket.py'],
+    scripts=['ws-emit.py'],
 
     # install_requires=[],
 
-    url='https://github.com/yaroslaff/redis2websocket',
+    url='https://github.com/yaroslaff/ws-emit',
     license='MIT',
     author='Yaroslav Polyakov',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     author_email='yaroslaff@gmail.com',
-    description='websocket microservice, easy to integrate with any python application',
+    description='Easily emit websocket events from any sources using redis or HTTP interface',
     install_requires=[
         'redis',
         'requests',
@@ -29,23 +29,23 @@ setup(
         'eventlet'
     ],
     data_files=[
-        ('redis2websocket/contrib', [
-            'contrib/redis2websocket.service',
-            'contrib/redis2websocket'
+        ('ws-emit/contrib', [
+            'contrib/ws-emit.service',
+            'contrib/ws-emit'
             ]),
-        ('redis2websocket/example', [
+        ('ws-emit/example', [
             'example/requirements.txt',
             'example/time.py',
             'example/dir2web.py',
             'example/subspy.py'
         ]),
-        ('redis2websocket/example/templates', [
+        ('ws-emit/example/templates', [
             'example/templates/time.html',
             'example/templates/dir2web.html'
         ])
     ],
 
-    python_requires='>=3',
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 3 - Alpha',
 

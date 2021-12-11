@@ -59,7 +59,7 @@ def join(message):
             log.debug('No secret in request')
             return
         
-        required_secret = r.get('r2ws::room_secret::' + roomspace)
+        required_secret = r.get('ws-emit::room_secret::' + roomspace)
         if not required_secret:
             log.debug(f'required secret not set in redis for {roomspace}')
             return
@@ -124,7 +124,7 @@ def main():
         for c in args.cors:
             cors.extend(c.split(' '))
 
-    log.info(f'Redis2websocket started on {args.address} cors: {cors}')
+    log.info(f'ws-emit started on {args.address} cors: {cors}')
 
 
     

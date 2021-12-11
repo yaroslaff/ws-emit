@@ -41,7 +41,7 @@ def main():
     def_redis = os.getenv('REDIS') or 'redis://localhost:6379/0'
 
 
-    parser = argparse.ArgumentParser(description='redis2websocket demo')
+    parser = argparse.ArgumentParser(description='time ws-emit demo')
     parser.add_argument('-v', dest='verbose', action='store_true',
         default=False, help='verbose mode')
     parser.add_argument('--redis', default=def_redis,

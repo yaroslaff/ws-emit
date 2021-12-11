@@ -1,0 +1,15 @@
+#
+# edit and copy to /etc/systemd/system/ws-emit.service
+#
+[Unit]
+Description=WS Emit microservice server
+After=redis.service
+
+[Service]
+DynamicUser=yes
+WorkingDirectory=/tmp
+ExecStart=/usr/local/bin/ws-emit.py
+EnvironmentFile=/etc/default/ws-emit
+
+[Install]
+WantedBy=multi-user.target
