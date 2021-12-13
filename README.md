@@ -22,6 +22,11 @@ or via HTTP interface (see below):
 curl -d @x.json -H "Content-Type: application/json" -X POST http://localhost:8899/emit
 ~~~
 
+## Screencast
+See below for detailed explanation what every example does.
+
+[![ws-emit screencast](https://img.youtube.com/vi/yQCIBFuogg4/0.jpg)](https://www.youtube.com/watch?v=yQCIBFuogg4)
+
 ## Installation
 ~~~
 pip3 install ws-emit
@@ -53,14 +58,14 @@ Room name optionally may have format roomspace::roomname (separated by '::'). Wh
 Rooms without '::' in name, are public, anyone can join it. They are not suited to send any sensitive info.
 
 ## Emitting messages over HTTP(s)
-It's possible to emit messages from any sources (any programming languages, even from PHP. really.) using HTTP interface. Here is simple example how to emit websocket events right from shell using curl.
+It's possible to emit messages from any sources (any programming languages, even from PHP or Perl or shell scripts. really.) using HTTP interface. Here is simple example how to emit websocket events right from shell using curl.
 
 HTTP emitting requres secret, like:
 ~~~
-./ws-emit.py --secret 123
+./ws-emit.py --secret MySecret
 ~~~
 
-or set `SECRET=123` in /etc/default/ws-emit
+or set `SECRET=MySecret` in /etc/default/ws-emit and restart ws-emit service.
 
 JSON file `x.json`:
 ~~~
@@ -85,10 +90,6 @@ You may run `time.py` example (see below) and execute this curl statement, it wi
 
 ## Examples
 
-### Screencast
-
-[![ws-emit screencast](https://img.youtube.com/vi/yQCIBFuogg4/0.jpg)](https://www.youtube.com/watch?v=yQCIBFuogg4)
-
 ### time
 Time is simplest example. No authentication at all.
 
@@ -105,7 +106,7 @@ Start `/usr/local/ws-emit/example/dir2web.py /tmp/ws-emit` in console and open h
 dir2web uses roomspace `dir` and sets access key to this roomspace as redis-key `ws-emit::room_secret::dir`. This key is provided to JS code running in browser, and then JS code send key when join rooms inside this roomspace.
 
 ### subspy
-Subspy `/usr/local/ws-emit/example/dir2web.py` it simple utility to *sniff* traffic in publish/subscribe redis channel.
+Subspy `/usr/local/ws-emit/example/subspy.py` it simple utility to *sniff* traffic in publish/subscribe redis channel.
 
 Example output (from time.py example):
 ~~~
