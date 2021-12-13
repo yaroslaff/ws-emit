@@ -23,8 +23,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    print(f"<{os.getpid()}> index")
-    return render_template('dir2web.html')
+    host = request.host.split(':')[0]    
+    return render_template('dir2web.html', scheme=request.scheme, host=host)
 
 @app.route('/<path:path>')
 def catch_all(path):

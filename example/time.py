@@ -18,7 +18,8 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return render_template('time.html')
+    host = request.host.split(':')[0]    
+    return render_template('time.html', scheme=request.scheme, host=host)
 
 def sysinfo():
 

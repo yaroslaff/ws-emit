@@ -3,8 +3,8 @@
 WS-Emit is simple microservice app to send (backend-to-frontend, one way) instant signals from backend to frontend web applications running in browser. ws-emit handles CORS configuration and authentication mechanism for different *room-spaces*.
 
 Example usages:
-- ecommerce website may update prices and stock information for all visitors in realtime, without need to refresh. And logged-in customers can see realtime status of their orders. 
-- social network may show user if someone is writing new comment right now and display comment when it will be sent
+- ecommerce website may update prices, stock and orders information for all visitors in realtime, without need to refresh. 
+- social network may show user if someone is writing new comment right now and display comment when it will be submitted
 - backend may update frontend about status of long-running requests, such as 'build is N% ready', 'deploying'
 
 WS-Emit is isolated microservice, running as separate process, so it does not require any integration and compatibility with your application.
