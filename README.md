@@ -3,11 +3,13 @@
 WS-Emit is simple microservice app to send (backend-to-frontend, one way) instant signals from backend to frontend web applications running in browser. ws-emit handles CORS configuration and authentication mechanism for different *room-spaces*.
 
 Example usages:
-- ecommerce website may update prices, stock and orders information for all visitors in realtime, without need to refresh. 
+- ecommerce website may update prices, stock and orders information on page in realtime, without need to refresh. 
 - social network may show user if someone is writing new comment right now and display comment when it will be submitted
 - backend may update frontend about status of long-running requests, such as 'build is N% ready', 'deploying'
 
-WS-Emit is isolated microservice, running as separate process, so it does not require any integration and compatibility with your application.
+WS-Emit benefits:
+- Isolated microservice, not requires any integration with your application
+- Compatible with application in any programming languages (if they can send HTTP requests or publish data to redis), any frameworks, any application web server 
 
 WS-Emit is based on [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-SocketIO) and sending message is as simple as in any other flask-socketio application:
 
@@ -21,16 +23,17 @@ WS-Emit is based on [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-Soc
         data = {
             'time': int(time.time())
         }
+
+        # This one line sends message
         socketio.emit('update', data, room='time')
+
         time.sleep(1)
 ~~~
 
-## WS-Emit vs Flask-SocketIO
-WS-Emit is based on [Flask](flask.palletsprojects.com/), [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-SocketIO) and [eventlet](https://eventlet.net/). 
-
-Using Flask-SocketIO as server requires to integrate application with Flask and with async webserver with websocket feature such as eventlet. This maybe not very good and not very simple if you use other framework and webserver. With ws-emit, application use Flask-SocketIO in much more simple way.
-
-Also, ws-emit provides easy authentication mechanism, and you can use one ws-emit service for many applications.
+or via HTTP interface (see below):
+~~~
+curl -d @x.json -H "Content-Type: application/json" -X POST http://localhost:8899/emit
+~~~
 
 ## Installation
 ~~~
@@ -100,9 +103,7 @@ Time is simplest example. No authentication at all.
 
 Start `/usr/local/ws-emit/example/time.py` in console. Navigate browser to http://localhost:7788/. You will see current system unixtime, it will update every second. 
 
-Caveats:
-- Make sure addresses are exactly matching to CORS value in ws-emit, http://localhost:7788 (default) and http://127.0.0.1:7788 are different
-- websocket server address (http://localhost:8899) is hardcoded into HTML file (/usr/local/ws-emit/example/templates/dir2web.html). If you start it not on localhost (e.g. in LXC container), you need to set correct address in HTML template.
+Make sure addresses are exactly matching to CORS value in ws-emit, http://localhost:7788 (default) and http://127.0.0.1:7788 are different
 
 ### dir2web
 Dir2web is more complex example with authentication and room-spaces.
