@@ -103,7 +103,7 @@ Time is simplest example. No authentication at all.
 
 Start `/usr/local/ws-emit/example/time.py` in console. Navigate browser to http://localhost:7788/. You will see current system unixtime, it will update every second. 
 
-Make sure addresses are exactly matching to CORS value in ws-emit, http://localhost:7788 (default) and http://127.0.0.1:7788 are different
+Make sure addresses are exactly matching to CORS value in ws-emit (--cors option or CORS= parameter in /etc/default/ws-emit), http://localhost:7788 (default) and http://127.0.0.1:7788 are different
 
 ### dir2web
 Dir2web is more complex example with authentication and room-spaces.
