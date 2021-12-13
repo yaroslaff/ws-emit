@@ -14,20 +14,7 @@ WS-Emit benefits:
 WS-Emit is based on [Flask-SocketIO](https://github.com/miguelgrinberg/Flask-SocketIO) and sending message is as simple as in any other flask-socketio application:
 
 ~~~python3
-    import time
-    from flask_socketio import SocketIO
-    socketio = SocketIO(message_queue='redis://')
-
-    while True:
-
-        data = {
-            'time': int(time.time())
-        }
-
-        # This one line sends message
-        socketio.emit('update', data, room='time')
-
-        time.sleep(1)
+socketio.emit('update', data, room='time')
 ~~~
 
 or via HTTP interface (see below):
@@ -97,6 +84,10 @@ You may run `time.py` example (see below) and execute this curl statement, it wi
 
 
 ## Examples
+
+### Screencast
+
+[![ws-emit screencast](https://img.youtube.com/vi/yQCIBFuogg4/0.jpg)](https://www.youtube.com/watch?v=yQCIBFuogg4)
 
 ### time
 Time is simplest example. No authentication at all.
