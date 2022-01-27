@@ -9,7 +9,7 @@ def read(filename):
 
 setup(
     name='ws-emit',
-    version='0.0.1post2',
+    version='0.0.2',
     scripts=['ws-emit.py'],
 
     # install_requires=[],

@@ -52,23 +52,26 @@ def join(message):
     log.debug(f"Join room: {message['room']!r} sid: {request.sid!r}")
 
 
+    try:
+        if '::' in message['room']:
+            roomspace = message['room'].split('::', 1)[0]
+            if not message.get('secret'):
+                log.debug('No secret in request')
+                return
+            
+            rkey = 'ws-emit::secret::' + roomspace
+            required_secret = r.get(rkey)
+            if not required_secret:
+                log.debug(f'required secret not set in redis for {roomspace} key: {rkey}')
+                return
 
-    if '::' in message['room']:
-        roomspace = message['room'].split('::', 1)[0]
-        if not message.get('secret'):
-            log.debug('No secret in request')
-            return
-        
-        required_secret = r.get('ws-emit::room_secret::' + roomspace)
-        if not required_secret:
-            log.debug(f'required secret not set in redis for {roomspace}')
-            return
-
-        if message.get('secret') != required_secret:
-            log.debug(f'failed secret for room {message["room"]!r}')
-            return 
-    print("Join", message['room'])
-    join_room(message['room'])
+            if message.get('secret') != required_secret:
+                log.debug(f'failed secret for room {message["room"]!r}')
+                return 
+        print("Join", message['room'])
+        join_room(message['room'])
+    except TypeError:
+        print(f"Incorrect room name: {message['room']!r}")
 
 @socketio.event
 def leave(message):
