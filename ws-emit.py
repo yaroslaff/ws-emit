@@ -32,8 +32,13 @@ def emit():
     room = request.json.get('room')
     data = request.json.get('data')
     namespace = request.json.get('namespace')
-    socketio.emit(event, data, room=room, namespace=namespace)
+    secret = request.json.get('secret')
 
+    if secret != args.secret:
+        return f"Incorrect secret {secret!r}\n", 403
+
+    socketio.emit(event, data, room=room, namespace=namespace)
+        
     return 'OK\n'
 
 #
