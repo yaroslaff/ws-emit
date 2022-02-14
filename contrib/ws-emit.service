@@ -9,7 +9,7 @@ After=redis.service
 DynamicUser=yes
 WorkingDirectory=/tmp
 ExecStart=/usr/local/bin/ws-emit.py
-EnvironmentFile=/etc/default/ws-emit
+EnvironmentFile=-/etc/default/ws-emit
 
 [Install]
 WantedBy=multi-user.target
