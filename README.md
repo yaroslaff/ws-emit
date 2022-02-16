@@ -53,7 +53,7 @@ ws-emit.py -a 0.0.0.0:8899 --cors http://localhost:7788 --secret 123
 ~~~
 
 ## Authentication and room-spaces
-Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key ws-emit::secret::*roomspace*. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key in redis (e.g. `SET ws-emit::secret::myroom MySecret_123`) and pass secret to frontend.
+Room name optionally may have format roomspace::roomname (separated by '::'). When client wants to join such room it must provide secret matching redis key `ws-emit::secret::*roomspace*`. If secrets aren't match, join request is ignored. All rooms in same roomspace shares same secret.  Backend must set this key in redis (e.g. `SET ws-emit::secret::myroom MySecret_123`) and pass secret to frontend.
 
 Rooms without '::' in name, are public, anyone can join it. They are not suited to send any sensitive info.
 
