@@ -88,6 +88,37 @@ curl -d @x.json -H "Content-Type: application/json" -X POST http://localhost:889
 You may run `time.py` example (see below) and execute this curl statement, it will send time 111111 and it will be displayed in browser for short time (less then 1s) until overwritten by next update.
 
 
+## ws-emit over nginx as https (wss://) proxy
+run ws-emit at other port, edit `/etc/default/ws-emit`:
+~~~
+...
+ADDRESS="127.0.0.1:8898"
+...
+~~~
+
+`/etc/nginx/sites-available/ws-emit`:
+~~~
+map $http_upgrade $connection_upgrade {
+    default Upgrade;
+    ''      close;
+}
+
+server {
+	listen 8899 ssl;
+	server_name ...;
+	ssl_certificate ...;
+	ssl_certificate_key ...;
+	
+	location / {
+		proxy_pass http://127.0.0.1:8898;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection $connection_upgrade;
+		proxy_set_header Host $host;
+   	}	
+}
+~~~
+
 ## Examples
 
 ### time
